@@ -576,7 +576,12 @@ animation:glisse 90s linear infinite;will-change:transform}
    trois blocs posés côte à côte. */
 /* cartes basses : à 305 px de haut, les trois lignes faisaient 1 245 px
    et ne tenaient jamais ensemble sur un écran de 900. */
-.ruban .av{flex:0 0 clamp(240px,21vw,330px);margin:0;border-radius:14px;
+/* LARGEUR EXPLICITE, pas seulement un flex-basis. Sur un conteneur en
+   `width:max-content`, Safari calcule la taille intrinsèque à partir du
+   CONTENU des cartes et ignore le flex-basis : mesuré chez Fadel, un ruban
+   de 42 204 px au lieu de 5 688, soit 2 344 px par carte. La ligne partait
+   donc très loin hors cadre et paraissait vide. */
+.ruban .av{flex:0 0 auto;width:clamp(240px,21vw,330px);margin:0;border-radius:14px;
 padding:15px 17px;gap:9px}
 .ruban .av q{font-size:13px;line-height:1.52;
 display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
@@ -588,7 +593,7 @@ display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hi
   /* sur téléphone on ne peut pas survoler : encore plus lent,
      et un appui met la ligne en pause */
   .ruban{animation-duration:76s}
-  .ruban .av{flex:0 0 72vw}
+  .ruban .av{flex:0 0 auto;width:72vw}
 }
 @media(prefers-reduced-motion:reduce){
   .ruban{animation:none;flex-wrap:wrap;width:auto}
