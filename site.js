@@ -299,8 +299,38 @@
       r.style.setProperty('--course', Math.round(r.scrollWidth / 2) + 'px');
     });
   }
+  /* Filet : si une ligne se retrouve vide malgré tout (calcul de largeur
+     différent d'un navigateur à l'autre), on la remet dans le sens commun
+     plutôt que de laisser un trou à l'écran. */
+  function verifieLignes() {
+    Array.prototype.forEach.call(doc.querySelectorAll('.fil'), function (f) {
+      var rf = f.getBoundingClientRect();
+      if (rf.width < 20 || rf.bottom < 0 || rf.top > window.innerHeight) return;
+      var r = f.querySelector('.ruban'), vues3 = 0;
+      Array.prototype.forEach.call(f.querySelectorAll('.av'), function (a) {
+        var b = a.getBoundingClientRect();
+        if (b.width > 0 && b.right > rf.left + 2 && b.left < rf.right - 2) vues3++;
+      });
+      if (vues3) return;
+      /* la ligne est vide : on remesure, et si ça ne suffit pas on la remet
+         dans le sens commun. Mieux vaut trois lignes qui vont du même côté
+         qu'un trou à l'écran. */
+      var demi = Math.round(r.scrollWidth / 2);
+      if (demi > 40 && demi < 40000 && r.style.getPropertyValue('--course') !== demi + 'px') {
+        r.style.setProperty('--course', demi + 'px');
+        if (f.classList.contains('retour')) r.style.marginLeft = '-' + demi + 'px';
+        return;
+      }
+      f.classList.remove('retour');
+      r.style.marginLeft = '0px';
+      r.style.removeProperty('--course');
+      r.style.setProperty('--course', demi + 'px');
+    });
+  }
   courses();
-  window.addEventListener('load', courses);
+  window.addEventListener('load', function () { courses(); setTimeout(verifieLignes, 500); });
+  /* contrôle permanent, pas seulement au chargement */
+  setInterval(verifieLignes, 2500);
   var minCourse = null;
   window.addEventListener('resize', function () {
     clearTimeout(minCourse); minCourse = setTimeout(courses, 200);
