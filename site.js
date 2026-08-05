@@ -306,12 +306,11 @@
     Array.prototype.forEach.call(doc.querySelectorAll('.fil'), function (f) {
       var rf = f.getBoundingClientRect();
       if (rf.width < 20 || rf.bottom < 0 || rf.top > window.innerHeight) return;
-      var r = f.querySelector('.ruban'), vues3 = 0;
-      Array.prototype.forEach.call(f.querySelectorAll('.av'), function (a) {
-        var b = a.getBoundingClientRect();
-        if (b.width > 0 && b.right > rf.left + 2 && b.left < rf.right - 2) vues3++;
-      });
-      if (vues3) return;
+      /* deux mesures par ligne, pas dix-huit : lire la boîte de chaque carte
+         coûtait un pic de 373 ms toutes les 2,5 s. Il suffit de savoir si le
+         ruban recouvre encore la ligne. */
+      var r = f.querySelector('.ruban'), rr = r.getBoundingClientRect();
+      if (rr.right > rf.left + 4 && rr.left < rf.right - 4) return;
       /* la ligne est vide : on remesure, et si ça ne suffit pas on la remet
          dans le sens commun. Mieux vaut trois lignes qui vont du même côté
          qu'un trou à l'écran. */
@@ -330,7 +329,7 @@
   courses();
   window.addEventListener('load', function () { courses(); setTimeout(verifieLignes, 500); });
   /* contrôle permanent, pas seulement au chargement */
-  setInterval(verifieLignes, 2500);
+  setInterval(verifieLignes, 4000);
   var minCourse = null;
   window.addEventListener('resize', function () {
     clearTimeout(minCourse); minCourse = setTimeout(courses, 200);
