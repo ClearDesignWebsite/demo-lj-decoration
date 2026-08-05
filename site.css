@@ -551,14 +551,22 @@ mask-image:linear-gradient(90deg,transparent 0,#000 15%,#000 85%,transparent 100
 animation:glisse 90s linear infinite;will-change:transform}
 /* même durée pour les trois : elles avancent ensemble, seule la ligne
    du milieu remonte à contresens. */
-.fil.retour .ruban{animation-direction:reverse}
+.fil.retour .ruban{animation-name:glisse-retour}
 .fil:hover .ruban,.fil:focus-within .ruban,.fil.stop .ruban{animation-play-state:paused}
 /* le doigt suffit à arrêter la ligne, et un second appui la relance */
 .fil{cursor:default}
 @media(hover:none){.fil{cursor:pointer}}
+/* La course est une DISTANCE EN PIXELS, mesurée dans la page et posée par le
+   script (--course). Un pourcentage se résout contre la largeur propre de
+   l'élément, et Safari ne la calcule pas comme Chrome sur un `width:max-content` :
+   le ruban du milieu partait hors cadre et la ligne paraissait vide. */
 @keyframes glisse{
   from{transform:translate3d(0,0,0)}
-  to{transform:translate3d(-50%,0,0)}
+  to{transform:translate3d(calc(var(--course, 50%) * -1),0,0)}
+}
+@keyframes glisse-retour{
+  from{transform:translate3d(calc(var(--course, 50%) * -1),0,0)}
+  to{transform:translate3d(0,0,0)}
 }
 /* bulles courtes : la ligne se lit comme un ruban qui passe, pas comme
    trois blocs posés côte à côte. */

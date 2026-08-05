@@ -290,6 +290,22 @@
     });
   }
 
+  /* ── les lignes d'avis : la course, en pixels ────────────
+     On mesure la moitié exacte du ruban et on la pose en pixels.
+     Sans ça le -50 % dépend de la façon dont le navigateur calcule la
+     largeur d'un `max-content`, et Safari vidait la ligne du milieu. */
+  function courses() {
+    Array.prototype.forEach.call(doc.querySelectorAll('.ruban'), function (r) {
+      r.style.setProperty('--course', Math.round(r.scrollWidth / 2) + 'px');
+    });
+  }
+  courses();
+  window.addEventListener('load', courses);
+  var minCourse = null;
+  window.addEventListener('resize', function () {
+    clearTimeout(minCourse); minCourse = setTimeout(courses, 200);
+  });
+
   /* ── les lignes d'avis, arrêtables au doigt ──────────────
      Sur téléphone il n'y a pas de survol : sans ça, personne ne peut
      figer une ligne pour finir de lire un avis. Un appui l'arrête,
