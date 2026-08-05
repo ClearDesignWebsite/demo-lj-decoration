@@ -545,10 +545,12 @@ transform .5s cubic-bezier(.22,1,.36,1)}
 .fil{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
 mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
 .ruban{display:flex;gap:clamp(9px,1vw,16px);width:max-content;
-animation:glisse 20s linear infinite;will-change:transform}
-.fil.retour .ruban{animation-direction:reverse;animation-duration:26s}
-@media(max-width:640px){.fil.retour .ruban{animation-duration:19s}}
-.fil:hover .ruban,.fil:focus-within .ruban{animation-play-state:paused}
+animation:glisse 52s linear infinite;will-change:transform}
+.fil.retour .ruban{animation-direction:reverse;animation-duration:64s}
+.fil:hover .ruban,.fil:focus-within .ruban,.fil.stop .ruban{animation-play-state:paused}
+/* le doigt suffit à arrêter la ligne, et un second appui la relance */
+.fil{cursor:default}
+@media(hover:none){.fil{cursor:pointer}}
 @keyframes glisse{
   from{transform:translate3d(0,0,0)}
   to{transform:translate3d(-50%,0,0)}
@@ -557,7 +559,10 @@ animation:glisse 20s linear infinite;will-change:transform}
 .ruban .av q{font-size:14.5px;line-height:1.62;
 display:-webkit-box;-webkit-line-clamp:7;-webkit-box-orient:vertical;overflow:hidden}
 @media(max-width:640px){
-  .ruban{animation-duration:15s}
+  /* sur téléphone on ne peut pas survoler : encore plus lent,
+     et un appui met la ligne en pause */
+  .ruban{animation-duration:62s}
+  .fil.retour .ruban{animation-duration:76s}
   .ruban .av{flex:0 0 78vw}
 }
 @media(prefers-reduced-motion:reduce){

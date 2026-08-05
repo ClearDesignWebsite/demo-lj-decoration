@@ -84,10 +84,8 @@
         meta = carr.querySelector('.titre .meta'),
         num = carr.querySelector('.compte b'),
         jauge = carr.querySelector('.jauge'),
-        n = vues.length, ici = 0, occupe = false, minuteur = null;
-    /* Pas d'avance automatique : le carrousel ne doit pas partir tout seul
-       quand on passe au dessus. C'est le visiteur qui décide. */
-    var auto = false;
+        n = vues.length, ici = 0, occupe = false, minuteur = null, auto = true;
+    var DUREE = 6000, tw = null, parti = 0, restant = DUREE;
 
     /* branche l'image d'une vue, et celle d'après : on ne télécharge
        jamais les sept d'un coup (1 066 Ko mesurés avant correction). */
@@ -112,13 +110,31 @@
       if (meta) meta.textContent = vues[i].dataset.meta || '';
       if (num) num.textContent = String(i + 1).padStart(2, '0');
     }
+    /* L'avance automatique repart de zéro à chaque vue. Passer la souris la
+       MET EN PAUSE, sans remettre le compte à zéro : avant, un simple survol
+       relançait tout le cycle, et le carrousel semblait se déclencher au
+       passage de la souris. */
     function relance() {
       clearTimeout(minuteur);
-      if (!jauge) return;
-      if (!auto || reduit || !gs) { if (jauge) jauge.style.transform = 'scaleX(0)'; return; }
+      if (tw) { tw.kill(); tw = null; }
+      if (!auto || reduit || !gs || !jauge) { if (jauge) jauge.style.transform = 'scaleX(0)'; return; }
+      restant = DUREE;
       gs.set(jauge, { scaleX: 0 });
-      gs.to(jauge, { scaleX: 1, duration: DUREE / 1000, ease: 'none' });
+      tw = gs.to(jauge, { scaleX: 1, duration: DUREE / 1000, ease: 'none' });
+      parti = Date.now();
       minuteur = setTimeout(function () { va(1); }, DUREE);
+    }
+    function suspend() {
+      if (!auto || !minuteur) return;
+      clearTimeout(minuteur); minuteur = null;
+      if (tw) tw.pause();
+      restant = Math.max(400, restant - (Date.now() - parti));
+    }
+    function reprend() {
+      if (!auto || minuteur || occupe) return;
+      if (tw) tw.resume();
+      parti = Date.now();
+      minuteur = setTimeout(function () { va(1); }, restant);
     }
     /* `cible` permet d'atteindre une vignette lointaine en UNE transition.
        Sans elle, on avançait d'un cran à la fois et le clic s'arrêtait en route. */
@@ -163,14 +179,14 @@
       if (i === ici) return;
       va(i > ici ? 1 : -1, i);
     }
-    carr.querySelector('.suiv').addEventListener('click', function () { auto = false; va(1); });
-    carr.querySelector('.prec').addEventListener('click', function () { auto = false; va(-1); });
+    carr.querySelector('.suiv').addEventListener('click', function () { va(1); });
+    carr.querySelector('.prec').addEventListener('click', function () { va(-1); });
     vign.forEach(function (b, k) {
-      b.addEventListener('click', function () { auto = false; vaA(k); });
+      b.addEventListener('click', function () { vaA(k); });
     });
     carr.addEventListener('keydown', function (e) {
-      if (e.key === 'ArrowRight') { auto = false; va(1); }
-      if (e.key === 'ArrowLeft') { auto = false; va(-1); }
+      if (e.key === 'ArrowRight') va(1);
+      if (e.key === 'ArrowLeft') va(-1);
     });
     /* glisser au doigt */
     var x0 = null;
@@ -178,18 +194,19 @@
     carr.addEventListener('touchend', function (e) {
       if (x0 === null) return;
       var d = e.changedTouches[0].clientX - x0;
-      if (Math.abs(d) > 44) { auto = false; va(d < 0 ? 1 : -1); }
+      if (Math.abs(d) > 44) va(d < 0 ? 1 : -1);
       x0 = null;
     }, { passive: true });
-    carr.addEventListener('mouseenter', function () { clearTimeout(minuteur); if (gs && jauge) gs.killTweensOf(jauge); });
-    carr.addEventListener('mouseleave', function () { if (auto) relance(); });
+    carr.addEventListener('mouseenter', suspend);
+    carr.addEventListener('mouseleave', reprend);
+    /* on ne fait pas tourner un carrousel que personne ne regarde */
+    doc.addEventListener('visibilitychange', function () {
+      if (doc.hidden) suspend(); else reprend();
+    });
     vues[0].classList.add('active');
     pose(0);
     demarre = relance;
-    pauseCarr = function (oui) {
-      if (oui) { clearTimeout(minuteur); if (gs && jauge) gs.killTweensOf(jauge); }
-      else if (auto) relance();
-    };
+    pauseCarr = function (oui) { if (oui) suspend(); else reprend(); };
   }
 
   /* ══ LA VISIONNEUSE ══════════════════════════════════════
@@ -269,6 +286,17 @@
       if (e.key === 'ArrowLeft') montre(rang - 1);
     });
   }
+
+  /* ── les lignes d'avis, arrêtables au doigt ──────────────
+     Sur téléphone il n'y a pas de survol : sans ça, personne ne peut
+     figer une ligne pour finir de lire un avis. Un appui l'arrête,
+     un second la relance. */
+  Array.prototype.forEach.call(doc.querySelectorAll('.fil'), function (f) {
+    f.addEventListener('click', function (e) {
+      if (e.target.closest('a')) return;
+      f.classList.toggle('stop');
+    });
+  });
 
   /* ── révélations ───────────────────────────────────────── */
   function toutPoser() {
