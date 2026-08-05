@@ -551,10 +551,14 @@ mask-image:linear-gradient(90deg,transparent 0,#000 15%,#000 85%,transparent 100
 animation:glisse 90s linear infinite;will-change:transform}
 /* même durée pour les trois : elles avancent ensemble, seule la ligne
    du milieu remonte à contresens. */
-/* La ligne du milieu part dans l'autre sens sans animation particulière :
-   on retourne la ligne, et on remet chaque carte à l'endroit. Le ruban
-   utilise exactement la même animation que les deux autres. */
-.fil.retour{transform:scaleX(-1)}
+/* Le retournement vit sur une couche intermédiaire, jamais sur l'élément
+   masqué : Safari rate la combinaison masque + transformation et n'affiche
+   plus rien. Le ruban garde exactement la même animation que les deux
+   autres lignes, celle qui fonctionne déjà. */
+/* pleine largeur du cadre, pas du ruban : le retournement doit pivoter
+   autour de ce qu'on voit, pas autour des 5 700 px du ruban. */
+.tapis{width:100%}
+.fil.retour .tapis{transform:scaleX(-1)}
 .fil.retour .av{transform:scaleX(-1)}
 .fil:hover .ruban,.fil:focus-within .ruban,.fil.stop .ruban{animation-play-state:paused}
 /* le doigt suffit à arrêter la ligne, et un second appui la relance */
