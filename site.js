@@ -85,7 +85,7 @@
         num = carr.querySelector('.compte b'),
         jauge = carr.querySelector('.jauge'),
         n = vues.length, ici = 0, occupe = false, minuteur = null, auto = true;
-    var DUREE = 6000, tw = null, parti = 0, restant = DUREE;
+    var DUREE = 6000, tw = null, parti = 0, restant = DUREE, gel = false;
 
     /* branche l'image d'une vue, et celle d'après : on ne télécharge
        jamais les sept d'un coup (1 066 Ko mesurés avant correction). */
@@ -117,6 +117,7 @@
     function relance() {
       clearTimeout(minuteur);
       if (tw) { tw.kill(); tw = null; }
+      if (gel) { if (jauge) jauge.style.transform = 'scaleX(0)'; minuteur = null; return; }
       if (!auto || reduit || !gs || !jauge) { if (jauge) jauge.style.transform = 'scaleX(0)'; return; }
       restant = DUREE;
       gs.set(jauge, { scaleX: 0 });
@@ -125,13 +126,14 @@
       minuteur = setTimeout(function () { va(1); }, DUREE);
     }
     function suspend() {
-      if (!auto || !minuteur) return;
+      if (!auto) return;
+      if (!minuteur) { if (tw) tw.pause(); return; }
       clearTimeout(minuteur); minuteur = null;
       if (tw) tw.pause();
       restant = Math.max(400, restant - (Date.now() - parti));
     }
     function reprend() {
-      if (!auto || minuteur || occupe) return;
+      if (!auto || gel || minuteur || occupe) return;
       if (tw) tw.resume();
       parti = Date.now();
       minuteur = setTimeout(function () { va(1); }, restant);
@@ -207,7 +209,7 @@
     vues[0].classList.add('active');
     pose(0);
     demarre = relance;
-    pauseCarr = function (oui) { if (oui) suspend(); else reprend(); };
+    pauseCarr = function (oui) { gel = oui; if (oui) suspend(); else reprend(); };
   }
 
   /* ══ LA VISIONNEUSE ══════════════════════════════════════

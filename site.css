@@ -545,8 +545,10 @@ transform .5s cubic-bezier(.22,1,.36,1)}
 .fil{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
 mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
 .ruban{display:flex;gap:clamp(9px,1vw,16px);width:max-content;
-animation:glisse 52s linear infinite;will-change:transform}
-.fil.retour .ruban{animation-direction:reverse;animation-duration:64s}
+animation:glisse 58s linear infinite;will-change:transform}
+/* même durée pour les trois : elles avancent ensemble, seule la ligne
+   du milieu remonte à contresens. */
+.fil.retour .ruban{animation-direction:reverse}
 .fil:hover .ruban,.fil:focus-within .ruban,.fil.stop .ruban{animation-play-state:paused}
 /* le doigt suffit à arrêter la ligne, et un second appui la relance */
 .fil{cursor:default}
@@ -555,15 +557,16 @@ animation:glisse 52s linear infinite;will-change:transform}
   from{transform:translate3d(0,0,0)}
   to{transform:translate3d(-50%,0,0)}
 }
-.ruban .av{flex:0 0 clamp(270px,26vw,360px);margin:0;border-radius:14px}
+/* trois bulles en largeur, quelle que soit la taille de l'écran :
+   la troisième est coupée par le masque, c'est voulu, ça cadre. */
+.ruban .av{flex:0 0 clamp(280px,31.5vw,820px);margin:0;border-radius:14px}
 .ruban .av q{font-size:14.5px;line-height:1.62;
 display:-webkit-box;-webkit-line-clamp:7;-webkit-box-orient:vertical;overflow:hidden}
 @media(max-width:640px){
   /* sur téléphone on ne peut pas survoler : encore plus lent,
      et un appui met la ligne en pause */
   .ruban{animation-duration:62s}
-  .fil.retour .ruban{animation-duration:76s}
-  .ruban .av{flex:0 0 78vw}
+  .ruban .av{flex:0 0 80vw}
 }
 @media(prefers-reduced-motion:reduce){
   .ruban{animation:none;flex-wrap:wrap;width:auto}
