@@ -530,3 +530,36 @@ transform:translate3d(-115%,0,0)}
 .card,.presta a{transition:box-shadow .6s ease,border-color .6s ease,background .6s ease,
 transform .5s cubic-bezier(.22,1,.36,1)}
 @media(prefers-reduced-motion:reduce){.lueur .lueur-v{animation:none}}
+
+
+/* ══ LES AVIS QUI DÉFILENT ═══════════════════════════════════════
+   Trois lignes de trois, en rectangles aux coins arrondis. Les deux
+   lignes des extrémités vont dans le même sens, celle du milieu à
+   contresens. Le ruban répète le trio quatre fois et se translate de
+   -50 % : à mi-course la seconde moitié occupe exactement la place de
+   la première, donc le raccord ne se voit jamais, même en 1 920 px.
+   Le mouvement porte sur le RUBAN, pas sur chaque carte : trois
+   couches animées en tout, réglées par le compositeur. */
+.avis-fil{overflow:hidden}
+.fils{display:grid;gap:clamp(9px,1vw,16px);margin-top:clamp(22px,2.6vw,38px)}
+.fil{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
+mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+.ruban{display:flex;gap:clamp(9px,1vw,16px);width:max-content;
+animation:glisse 46s linear infinite;will-change:transform}
+.fil.retour .ruban{animation-direction:reverse}
+.fil:hover .ruban,.fil:focus-within .ruban{animation-play-state:paused}
+@keyframes glisse{
+  from{transform:translate3d(0,0,0)}
+  to{transform:translate3d(-50%,0,0)}
+}
+.ruban .av{flex:0 0 clamp(270px,26vw,360px);margin:0;border-radius:14px}
+.ruban .av q{font-size:14.5px;line-height:1.62;
+display:-webkit-box;-webkit-line-clamp:7;-webkit-box-orient:vertical;overflow:hidden}
+@media(max-width:640px){
+  .ruban{animation-duration:34s}
+  .ruban .av{flex:0 0 78vw}
+}
+@media(prefers-reduced-motion:reduce){
+  .ruban{animation:none;flex-wrap:wrap;width:auto}
+  .fil{-webkit-mask-image:none;mask-image:none}
+}
