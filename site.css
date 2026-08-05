@@ -381,7 +381,10 @@ transition:padding-left .45s cubic-bezier(.22,1,.36,1)}
 .ligne:hover{padding-left:12px}
 .ligne small{display:block;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;
 color:rgba(255,255,255,.5);margin-bottom:6px}
-.ligne strong{font-family:"Didot",Georgia,serif;font-size:22px;font-weight:400}
+.ligne strong{font-family:"Didot",Georgia,serif;font-size:22px;font-weight:400;
+display:block;overflow-wrap:anywhere;word-break:break-word;hyphens:auto}
+/* à 390 px, l'adresse e-mail en Didot 22 px sortait du cadre */
+@media(max-width:640px){.ligne strong{font-size:17px;line-height:1.35}}
 .form{display:grid;gap:16px}
 .form label{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gris)}
 .form input,.form textarea{display:block;width:100%;margin-top:7px;padding:13px 0;border:0;
@@ -495,20 +498,35 @@ body.pret .bar .logo img{opacity:1;transition:opacity .35s ease}
 }
 
 
+
+
 /* ══ LA LUEUR, SUR TÉLÉPHONE ═════════════════════════════════════
-   Sans souris, personne ne découvre qu'une case réagit. Une lueur
-   passe donc sur chacune à son tour : au dévoilement, puis toutes
-   les dix secondes. Elle ne se déclenche jamais sur un écran à souris. */
-.card, .carte-im{position:relative}
-.card::after,.carte-im .halo2{content:"";position:absolute;inset:-1px;z-index:4;pointer-events:none;
-opacity:0;border-radius:inherit;
-background:radial-gradient(120% 90% at 50% 108%,rgba(240,210,210,.62),rgba(240,210,210,0) 62%);
-box-shadow:inset 0 0 0 1px rgba(240,210,210,.85), 0 0 26px -4px rgba(240,210,210,.75)}
-.carte-im .halo2{background:radial-gradient(120% 90% at 50% 108%,rgba(240,210,210,.42),rgba(240,210,210,0) 62%)}
-@keyframes lueur{
-  0%{opacity:0}
-  22%{opacity:1}
-  100%{opacity:0}
+   Sans souris, rien ne dit qu'une case réagit. Une lumière la traverse
+   donc en diagonale, comme un reflet qui passe : au dévoilement, puis
+   toutes les dix secondes. Jamais sur un écran à souris.
+   `inset:0` et non -1px : à -1 la lueur dépassait du cadre et faisait
+   déborder la page d'un pixel de chaque côté. */
+.card, .carte-im, .presta a{position:relative;overflow:hidden}
+.lueur-v{position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;
+background:linear-gradient(104deg,
+  rgba(240,210,210,0) 34%,
+  rgba(255,246,246,.92) 47%,
+  rgba(240,210,210,.55) 53%,
+  rgba(240,210,210,0) 66%);
+transform:translate3d(-115%,0,0)}
+.carte-im .lueur-v{background:linear-gradient(104deg,
+  rgba(255,255,255,0) 34%, rgba(255,255,255,.5) 47%,
+  rgba(240,210,210,.34) 53%, rgba(255,255,255,0) 66%)}
+@keyframes balaye{
+  0%{opacity:0;transform:translate3d(-115%,0,0)}
+  12%{opacity:1}
+  88%{opacity:1}
+  100%{opacity:0;transform:translate3d(115%,0,0)}
 }
-.card.lueur::after,.carte-im.lueur .halo2{animation:lueur 1.9s cubic-bezier(.22,1,.36,1)}
-@media(prefers-reduced-motion:reduce){.card.lueur::after,.carte-im.lueur .halo2{animation:none}}
+.lueur .lueur-v{animation:balaye 1.35s cubic-bezier(.36,.06,.2,1)}
+/* le cadre s'allume une fraction de seconde en même temps */
+.card.lueur{box-shadow:inset 0 0 0 1px rgba(240,210,210,.9)}
+.presta a.lueur{border-color:var(--rose);background:#FFF8F8}
+.card,.presta a{transition:box-shadow .6s ease,border-color .6s ease,background .6s ease,
+transform .5s cubic-bezier(.22,1,.36,1)}
+@media(prefers-reduced-motion:reduce){.lueur .lueur-v{animation:none}}

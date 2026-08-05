@@ -344,20 +344,20 @@
      dévoilement puis toutes les dix secondes, tant qu'elle est à l'écran. */
   var tactile = window.matchMedia('(hover: none)').matches || window.innerWidth <= 900;
   if (tactile && !reduit) {
-    var cases = [].slice.call(doc.querySelectorAll('.card, .carte-im'));
+    var cases = [].slice.call(doc.querySelectorAll('.card, .carte-im, .presta a'));
     if (cases.length) {
       var brille = function (e) {
         if (!e) return;
         e.classList.remove('lueur');
         void e.offsetWidth;               /* on relance l'animation */
         e.classList.add('lueur');
-        setTimeout(function () { e.classList.remove('lueur'); }, 2100);
+        setTimeout(function () { e.classList.remove('lueur'); }, 1500);
       };
       /* au dévoilement */
-      ST.batch('.card, .carte-im', {
+      ST.batch('.card, .carte-im, .presta a', {
         start: 'top 88%', once: true,
         onEnter: function (lot) {
-          lot.forEach(function (e, i) { setTimeout(function () { brille(e); }, 380 + i * 260); });
+          lot.forEach(function (e, i) { setTimeout(function () { brille(e); }, 340 + i * 150); });
         }
       });
       /* puis toutes les dix secondes, sur celles qui sont à l'écran */
