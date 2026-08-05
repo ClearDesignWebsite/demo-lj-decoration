@@ -290,45 +290,19 @@
     });
   }
 
-  /* ── les lignes d'avis : la course, en pixels ────────────
-     On mesure la moitié exacte du ruban et on la pose en pixels.
-     Sans ça le -50 % dépend de la façon dont le navigateur calcule la
-     largeur d'un `max-content`, et Safari vidait la ligne du milieu. */
-  function courses() {
-    Array.prototype.forEach.call(doc.querySelectorAll('.ruban'), function (r) {
-      r.style.setProperty('--course', Math.round(r.scrollWidth / 2) + 'px');
-    });
-  }
-  /* Filet : si une ligne se retrouve vide malgré tout (calcul de largeur
-     différent d'un navigateur à l'autre), on la remet dans le sens commun
-     plutôt que de laisser un trou à l'écran. */
+  /* Filet : si une ligne visible n'est plus recouverte par son ruban,
+     on la remet dans le sens commun. Deux mesures par ligne, toutes les
+     4 s : lire chaque carte coûtait un pic de 373 ms. */
   function verifieLignes() {
     Array.prototype.forEach.call(doc.querySelectorAll('.fil'), function (f) {
       var rf = f.getBoundingClientRect();
       if (rf.width < 20 || rf.bottom < 0 || rf.top > window.innerHeight) return;
-      /* deux mesures par ligne, pas dix-huit : lire la boîte de chaque carte
-         coûtait un pic de 373 ms toutes les 2,5 s. Il suffit de savoir si le
-         ruban recouvre encore la ligne. */
       var r = f.querySelector('.ruban'), rr = r.getBoundingClientRect();
       if (rr.right > rf.left + 4 && rr.left < rf.right - 4) return;
-      /* la ligne est vide : on remesure, et si ça ne suffit pas on la remet
-         dans le sens commun. Mieux vaut trois lignes qui vont du même côté
-         qu'un trou à l'écran. */
-      var demi = Math.round(r.scrollWidth / 2);
-      if (demi > 40 && demi < 40000 && r.style.getPropertyValue('--course') !== demi + 'px') {
-        r.style.setProperty('--course', demi + 'px');
-        if (f.classList.contains('retour')) r.style.marginLeft = '-' + demi + 'px';
-        return;
-      }
       f.classList.remove('retour');
-      r.style.marginLeft = '0px';
-      r.style.removeProperty('--course');
-      r.style.setProperty('--course', demi + 'px');
     });
   }
-  courses();
-  window.addEventListener('load', function () { courses(); setTimeout(verifieLignes, 500); });
-  /* contrôle permanent, pas seulement au chargement */
+  window.addEventListener('load', function () { setTimeout(verifieLignes, 600); });
   setInterval(verifieLignes, 4000);
   var minCourse = null;
   window.addEventListener('resize', function () {
