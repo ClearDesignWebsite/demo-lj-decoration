@@ -493,3 +493,22 @@ body.pret .bar .logo img{opacity:1;transition:opacity .35s ease}
   body:not(.pret){overflow:visible}
   body:not(.pret) .bar .logo img{opacity:1}
 }
+
+
+/* ══ LA LUEUR, SUR TÉLÉPHONE ═════════════════════════════════════
+   Sans souris, personne ne découvre qu'une case réagit. Une lueur
+   passe donc sur chacune à son tour : au dévoilement, puis toutes
+   les dix secondes. Elle ne se déclenche jamais sur un écran à souris. */
+.card, .carte-im{position:relative}
+.card::after,.carte-im .halo2{content:"";position:absolute;inset:-1px;z-index:4;pointer-events:none;
+opacity:0;border-radius:inherit;
+background:radial-gradient(120% 90% at 50% 108%,rgba(240,210,210,.62),rgba(240,210,210,0) 62%);
+box-shadow:inset 0 0 0 1px rgba(240,210,210,.85), 0 0 26px -4px rgba(240,210,210,.75)}
+.carte-im .halo2{background:radial-gradient(120% 90% at 50% 108%,rgba(240,210,210,.42),rgba(240,210,210,0) 62%)}
+@keyframes lueur{
+  0%{opacity:0}
+  22%{opacity:1}
+  100%{opacity:0}
+}
+.card.lueur::after,.carte-im.lueur .halo2{animation:lueur 1.9s cubic-bezier(.22,1,.36,1)}
+@media(prefers-reduced-motion:reduce){.card.lueur::after,.carte-im.lueur .halo2{animation:none}}

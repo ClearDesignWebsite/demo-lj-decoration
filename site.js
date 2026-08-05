@@ -338,6 +338,43 @@
   window.addEventListener('load', rattrape);
   window.addEventListener('scroll', rattrape, { passive: true, once: true });
 
+  /* ══ LA LUEUR SUR TÉLÉPHONE ══════════════════════════════
+     Sur un écran tactile il n'y a pas de survol : rien ne dit qu'une
+     case réagit. Une lueur passe donc sur chacune à son tour, au
+     dévoilement puis toutes les dix secondes, tant qu'elle est à l'écran. */
+  var tactile = window.matchMedia('(hover: none)').matches || window.innerWidth <= 900;
+  if (tactile && !reduit) {
+    var cases = [].slice.call(doc.querySelectorAll('.card, .carte-im'));
+    if (cases.length) {
+      var brille = function (e) {
+        if (!e) return;
+        e.classList.remove('lueur');
+        void e.offsetWidth;               /* on relance l'animation */
+        e.classList.add('lueur');
+        setTimeout(function () { e.classList.remove('lueur'); }, 2100);
+      };
+      /* au dévoilement */
+      ST.batch('.card, .carte-im', {
+        start: 'top 88%', once: true,
+        onEnter: function (lot) {
+          lot.forEach(function (e, i) { setTimeout(function () { brille(e); }, 380 + i * 260); });
+        }
+      });
+      /* puis toutes les dix secondes, sur celles qui sont à l'écran */
+      var tour = 0;
+      setInterval(function () {
+        if (doc.hidden) return;
+        var vues2 = cases.filter(function (e) {
+          var r = e.getBoundingClientRect();
+          return r.top < window.innerHeight - 40 && r.bottom > 40;
+        });
+        if (!vues2.length) return;
+        brille(vues2[tour % vues2.length]);
+        tour++;
+      }, 10000);
+    }
+  }
+
   /* Déclencheur 2 — le hero respire pendant qu'on le quitte. */
   var fond = doc.querySelector('.hero .fond');
   if (fond) {
