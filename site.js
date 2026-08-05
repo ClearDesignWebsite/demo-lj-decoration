@@ -197,8 +197,9 @@
       if (Math.abs(d) > 44) va(d < 0 ? 1 : -1);
       x0 = null;
     }, { passive: true });
-    carr.addEventListener('mouseenter', suspend);
-    carr.addEventListener('mouseleave', reprend);
+    /* Le carrousel continue de tourner sous la souris : le survol ne
+       l'arrête plus. Il ne se met en pause que dans deux cas où il n'y
+       a personne pour le voir : la visionneuse ouverte, ou l'onglet caché. */
     /* on ne fait pas tourner un carrousel que personne ne regarde */
     doc.addEventListener('visibilitychange', function () {
       if (doc.hidden) suspend(); else reprend();
