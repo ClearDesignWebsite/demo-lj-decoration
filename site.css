@@ -542,8 +542,10 @@ transform .5s cubic-bezier(.22,1,.36,1)}
    couches animées en tout, réglées par le compositeur. */
 .avis-fil{overflow:hidden}
 .fils{display:grid;gap:clamp(9px,1vw,16px);margin-top:clamp(22px,2.6vw,38px)}
-.fil{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+/* les côtés se fondent franchement : le ruban n'a ni début ni fin visible */
+.fil{overflow:hidden;
+-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 15%,#000 85%,transparent 100%);
+mask-image:linear-gradient(90deg,transparent 0,#000 15%,#000 85%,transparent 100%)}
 .ruban{display:flex;gap:clamp(9px,1vw,16px);width:max-content;
 animation:glisse 58s linear infinite;will-change:transform}
 /* même durée pour les trois : elles avancent ensemble, seule la ligne
@@ -557,16 +559,19 @@ animation:glisse 58s linear infinite;will-change:transform}
   from{transform:translate3d(0,0,0)}
   to{transform:translate3d(-50%,0,0)}
 }
-/* trois bulles en largeur, quelle que soit la taille de l'écran :
-   la troisième est coupée par le masque, c'est voulu, ça cadre. */
-.ruban .av{flex:0 0 clamp(280px,31.5vw,820px);margin:0;border-radius:14px}
-.ruban .av q{font-size:14.5px;line-height:1.62;
-display:-webkit-box;-webkit-line-clamp:7;-webkit-box-orient:vertical;overflow:hidden}
+/* bulles courtes : la ligne se lit comme un ruban qui passe, pas comme
+   trois blocs posés côte à côte. */
+.ruban .av{flex:0 0 clamp(240px,21vw,330px);margin:0;border-radius:14px;
+padding:clamp(16px,1.5vw,22px)}
+.ruban .av q{font-size:13.5px;line-height:1.58;
+display:-webkit-box;-webkit-line-clamp:8;-webkit-box-orient:vertical;overflow:hidden}
+.ruban .av .etoiles{font-size:11.5px}
+.ruban .av .qui b{font-size:13px}
 @media(max-width:640px){
   /* sur téléphone on ne peut pas survoler : encore plus lent,
      et un appui met la ligne en pause */
   .ruban{animation-duration:62s}
-  .ruban .av{flex:0 0 80vw}
+  .ruban .av{flex:0 0 72vw}
 }
 @media(prefers-reduced-motion:reduce){
   .ruban{animation:none;flex-wrap:wrap;width:auto}
